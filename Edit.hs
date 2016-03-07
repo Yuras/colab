@@ -43,11 +43,15 @@ transform (Delete from1 count1) (Delete from2 count2)
   = (Delete from1 count1, Delete (from2 - count1) count2)
   | from1 >= from2 + count2
   = (Delete (from1 - count2) count1, Delete from2 count2)
+  | from1 >= from2 && from1 + count1 <= from2 + count2
+  = (Delete from2 0, Delete from2 (count2 - count1))
+  | from2 >= from1 && from2 + count2 <= from1 + count1
+  = (Delete from1 (count1 - count2), Delete from1 0)
   | from1 >= from2
-  = let d = from1 - from2
+  = let d = from2 + count2 - from1
     in (Delete from2 (count1 - d), Delete from2 (count2 - d))
   | otherwise
-  = let d = from2 - from1
+  = let d = from1 + count1 - from2
     in (Delete from1 (count1 - d), Delete from1 (count2 - d))
 
 transform (Insert at t) (Delete from count)
